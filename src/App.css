@@ -1,0 +1,261 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.flexMe {
+  display: flex;
+  background-color: #282c34;
+  justify-content: center;
+
+
+}
+.main {
+  width: 40%;
+  background-color: white;
+  padding: 1em;
+  padding-bottom: 1.1em;
+  border-radius: 15px;
+  margin: 1em;
+}
+
+.main ul li {
+  list-style: none;
+}
+
+.play {
+  position: relative;
+  left: 0.35em;
+  height: 1.6em;
+  width: 1.6em;
+  clip-path: polygon(
+    40% 0,
+    /* top left of horizontal bar */ 60% 0,
+    /* top right of horizontal bar */ 60% 40%,
+    /* right top of vertical bar */ 100% 40%,
+    /* right middle of vertical bar */ 100% 60%,
+    /* right bottom of vertical bar */ 60% 60%,
+    /* left bottom of vertical bar */ 60% 100%,
+    /* bottom right of horizontal bar */ 40% 100%,
+    /* bottom left of horizontal bar */ 40% 60%,
+    /* left bottom of vertical bar */ 0 60%,
+    /* left middle of vertical bar */ 0 40%,
+    /* left top of vertical bar */ 40% 40% /* top left of vertical bar */
+  );
+  background-color: black;
+  transform: rotate(-90deg);
+  align-self: center;
+  margin-top: 0.7em;
+  justify-self: center;
+  transition: transform 0.5s, background-color 0.5s;
+}
+
+.loader:hover .play {
+  background-color: gray;
+  transform: rotate(-180deg);
+}
+
+.albumcover > img {
+  position: relative;
+  margin-right: 1em;
+  height: 40px;
+  width: 40px;
+  align-self: center;
+  border-radius: 5px;
+  rotate: 180deg;
+}
+
+.song {
+  position: relative;
+  transform: rotate(180deg);
+  margin-right: 1em;
+  color: black;
+  align-self: center;
+}
+
+.artist {
+  font-size: 0.6em;
+}
+
+.loader {
+  display: flex;
+  flex-direction: row;
+  height: 4em;
+  padding-left: 1em;
+  padding-right: 1em;
+  transform: rotate(180deg);
+  justify-content: right;
+  border-radius: 10px;
+  transition: 0.4s ease-in-out;
+  align-items: center;
+}
+
+.loader:hover {
+  cursor: pointer;
+  background-color: lightgray;
+}
+
+.currentplaying {
+  display: flex;
+  margin: 1em;
+}
+
+.spotify {
+  width: 50px;
+  height: 50px;
+  margin-right: 0.6em;
+}
+
+.heading {
+  color: black;
+  font-size: 1.1em;
+  font-weight: bold;
+  align-self: center;
+}
+
+.loading {
+  display: flex;
+  margin-top: 1em;
+  margin-left: 0.3em;
+}
+
+.load {
+  width: 2px;
+  height: 33px;
+  background-color: limegreen;
+  animation: 1s move6 infinite;
+  border-radius: 5px;
+  margin: 0.1em;
+}
+
+.load:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.load:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.load:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes move6 {
+  0% {
+    height: 0.2em;
+  }
+
+  25% {
+    height: 0.7em;
+  }
+
+  50% {
+    height: 1.5em;
+  }
+
+  100% {
+    height: 0.2em;
+  }
+}
+
+.group {
+  display: flex;
+  line-height: 28px;
+  align-items: center;
+  position: relative;
+  max-width: 190px;
+}
+
+.input {
+  width: 100%;
+  height: 40px;
+  line-height: 28px;
+  padding: 0 1rem;
+  padding-left: 2.5rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  background-color: #f3f3f4;
+  color: #0d0c22;
+  transition: 0.3s ease;
+}
+
+.input::placeholder {
+  color: #9e9ea7;
+}
+
+.input:focus,
+input:hover {
+  outline: none;
+  border-color: rgba(247, 127, 0, 0.4);
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgb(247 127 0 / 10%);
+}
+
+.icon {
+  position: absolute;
+  left: 1rem;
+  fill: #9e9ea7;
+  width: 1rem;
+  height: 1rem;
+}
+
+.searchFlex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+
+
+.formStyle {
+  display: flex;
+  gap: 1em;
+  margin-left: 5px;
+}
+
+.formStyle > button {
+  border-radius: 15%;
+  width: 50%;
+  border: 0px dashed rgb(60, 59, 59);
+  cursor: pointer;
+}
+
+header {
+  background-color: #0d0c22;
+}

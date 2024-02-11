@@ -1,110 +1,116 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-// Your clientId is hardcoded here, in a real app this should be in an environment variable
-const clientId = "2f2adef7bfb447d4a80fe37281c3cb62"; 
+export default function FetchApi({ handleTokenChange }) {
+  const clientId = "2f2adef7bfb447d4a80fe37281c3cb62";
+  const redirectUri = "http://localhost:3000/";
+  const authEndPoint = "https://accounts.spotify.com/authorize";
+  const responseType = "token";
+  const scope = "user-read-private user-read-email";
+  const challengeCode = "S256";
 
-const FetchApi = () => {
-  const [profile, setProfile] = useState(null);
-  const [error, setError] = useState(null);
+  const [challenge, setChallenge] = useState('');
+  const [token, setToken] = useState(() => window.localStorage.getItem("token") || "");
+  const [userData, setUserData] = useState({});
 
-  useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get("code");
-
-    if (!code) {
-      redirectToAuthCodeFlow(clientId);
-    } else {
-      getAccessToken(clientId, code)
-        .then(accessToken => fetchProfile(accessToken))
-        .then(profile => setProfile(profile))
-        .catch(error => setError(error));
-    }
-  }, []);
-
-  async function redirectToAuthCodeFlow(clientId) {
-    const verifier = generateCodeVerifier(128);
-    const challenge = await generateCodeChallenge(verifier);
-
-    localStorage.setItem("verifier", verifier);
-
-    const params = new URLSearchParams();
-    params.append("client_id", clientId);
-    params.append("response_type", "code");
-    params.append("redirect_uri", "http://localhost:3000/");
-    params.append("scope", "user-read-private user-read-email");
-    params.append("code_challenge_method", "S256");
-    params.append("code_challenge", challenge);
-
-    document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
-
-}
-
-function generateCodeVerifier(length) {
+  // Function to generate a code verifier for PKCE
+  const generateCodeVerifier = (length) => {
     let text = "";
-    let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
+    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     for (let i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
-
     return text;
-}
+  };
 
-async function generateCodeChallenge(codeVerifier) {
+  const verifier = generateCodeVerifier(128);
+
+  // Function to generate a code challenge from the verifier
+  const generateCodeChallenge = async (codeVerifier) => {
     const data = new TextEncoder().encode(codeVerifier);
     const digest = await window.crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode.apply(null, new Uint8Array(digest)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+  };
 
-    return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-}
+  useEffect(() => {
+    const fetchChallenge = async () => {
+      const challenge = await generateCodeChallenge(verifier);
+      setChallenge(challenge);
+    };
 
-async function getAccessToken(clientId, code) {
-    const verifier = localStorage.getItem('verifier');
+    fetchChallenge();
+  }, [verifier]);
 
-    const params = new URLSearchParams();
-    params.append("client_id", clientId);
-    params.append("grant_type", "authorization_code");
-    params.append("code", code);
-    params.append("redirect_uri", "http://localhost:3000/");
-    params.append("code_verifier", verifier);
+  useEffect(() => {
+    // Extract the access token from the URL hash
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
 
-    const result = await fetch("https://accounts.spotify.com/api/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params
-    });
+    if (accessToken) {
+      window.localStorage.setItem("token", accessToken);
+      setToken(accessToken);
+      handleTokenChange(accessToken);
+      window.location.hash = ''; // Clear the hash to hide the token from the URL
+    }
+  }, [handleTokenChange]);
 
-    const { access_token } = await result.json();
-    return access_token;
-}
+  useEffect(() => {
+    const checkSpotifyConnection = async () => {
+      if (!token) return;
 
-async function fetchProfile(token) {
-    const result = await fetch("https://api.spotify.com/v1/me", {
-        method: "GET", headers: { Authorization: `Bearer ${token}` }
-    });
+      try {
+        const response = await axios.get('https://api.spotify.com/v1/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUserData(response.data);
+        console.log(response.data); // Log user data here
+      } catch (error) {
+        console.error('Error connecting to Spotify:', error.response || error);
+        logout();
+      }
+    };
 
-    return await result.json();
-}
+    checkSpotifyConnection();
+  }, [token]); // Adding token as a dependency so useEffect runs when token changes
 
+  const logout = () => {
+    setToken("");
+    window.localStorage.removeItem("token");
+    // Optionally, redirect or update the UI to reflect the logout
+  };
 
-  // Your render logic goes here
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  if (!profile) {
-    return <div>Loading...</div>;
-  }
+  let urlToken = `${authEndPoint}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${encodeURIComponent(scope)}&code_challenge_method=${challengeCode}&code_challenge=${challenge}`;
 
   return (
-    <div>
-        {console.log(profile)}
-      <h1>Spotify Profile Data</h1>
-      <p>Name: {profile.display_name}</p>
-      {/* Render the rest of your profile data here */}
-    </div>
+    <>
+      <div>
+        {!token ? (
+          <div>
+            <a href={urlToken}>Login</a>
+          </div>
+        ) : (
+          <div className="flex items-center gap-4 justify-end">
+            <div className="ml-4">
+              <button onClick={logout}>Logout</button>
+            </div>
+            <div className="flex items-center gap-4">
+              <div><h1>{userData.display_name}</h1> </div>
+              {userData.images && userData.images.length > 0 && (
+                <div className="albumcover">
+                  <img className="rounded-3xl shadow-lg shadow-cyan-500/50" src={userData.images[0].url} alt="User Profile" />
+                  
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
-
-export default FetchApi;

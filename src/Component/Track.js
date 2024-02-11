@@ -1,25 +1,30 @@
 import React from "react";
-import datas from "./dataFeed"
 
-export default function Track() {
+export default function Track({ tracks, remove }) {
 
   return (
     <>
-       <div className="main">
-      <ul>
-        {datas.map((song) => (
-          <li key={song.id}>
-            <div className="loader">
-              <div className="song">
-                <p className="name">{song.songName}</p>
-                <p className="artist">{song.artist}</p>
-              </div>
-              <div class="albumcover"><img src={song.src} alt={song.songName} /></div>
-              <div class="play"></div>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="main">
+        <ul>
+          {tracks.map((track) => (
+            <li key={track.id}>
+              <button onClick={() => remove(track)}> {/* Updated this line */}
+                <div className="loader">
+                  <div className="song">
+                    <p className="name">{track.name}</p>
+                    <p className="artist">{track.artists.map(artist => artist.name).join(', ')}</p>
+                  </div>
+                  {track.album.images.length > 0 && (
+                    <div className="albumcover">
+                      <img src={track.album.images[0].url} alt={track.name} />
+                    </div>
+                  )}
+                  <div className="play"></div>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </>
   );

@@ -2,13 +2,13 @@ import React from "react";
 import Track from "./Track";
 import SearchResults from "./SearchResults";
 
-export default function Tracklist({q}) {
+export default function Tracklist({q, token, songs, add, remove}) {
   return (
     <>
       <div className="flexMe">
 
-          <Track />
-          <SearchResults q={q} />
+          <Track tracks={songs} remove={remove}/>
+          <SearchResults q={q} token={token} add={add} />
       </div>
     </>
   );

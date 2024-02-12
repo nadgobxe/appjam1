@@ -20,6 +20,7 @@ export default function SearchResults({ q, token, add }) {
                     }
                 });
                 setTracks(response.data.tracks.items); // Store the array of track objects
+                console.log(response.data.tracks.items)
             } catch (error) {
                 console.error('Error connecting to Spotify:', error.response || error);
             }

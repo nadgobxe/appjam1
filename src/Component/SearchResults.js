@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function SearchResults({ q, token, add }) {
+export default function SearchResults({ q, token, add, songs }) {
     const [tracks, setTracks] = useState([]);
+    const [displayTracks, setDisplayTracks] = useState([]);
+
 
     useEffect(() => {
         const searchApi = async () => {
@@ -19,8 +21,9 @@ export default function SearchResults({ q, token, add }) {
                         limit: 10
                     }
                 });
-                setTracks(response.data.tracks.items); // Store the array of track objects
-                console.log(response.data.tracks.items)
+                // Store the array of track objects
+                setTracks(response.data.tracks.items);
+                // Attempting to log .uri of undefined will cause an error. Removed for correction.
             } catch (error) {
                 console.error('Error connecting to Spotify:', error.response || error);
             }
@@ -29,15 +32,26 @@ export default function SearchResults({ q, token, add }) {
         searchApi();
     }, [q, token]);
 
-    // No need to filter on the client side if q is the query used in the API request
-    // The API already returns filtered search results based on q
+    useEffect(() => {
+        // Filter tracks to exclude those that are already in songs
+        const filteredTracks = tracks.filter(track => 
+          !songs.some(song => song.uri === track.uri)
+        );
+        setDisplayTracks(filteredTracks);
+      }, [tracks, songs]); // Re-run filter when tracks or songs change
+    
+      const handleAdd = (trackToAdd) => {
+        add(trackToAdd); // Call the add function passed as prop
+        // Optionally, filter displayTracks immediately without waiting for songs prop to update
+        // setDisplayTracks(displayTracks.filter(track => track.id !== trackToAdd.id));
+      };
 
     return (
         <div className="main">
             <ul>
-                {tracks.map((track) => (
+                {displayTracks.map((track) => (
                     <li key={track.id}>
-                        <button onClick={() => add(track)}> {/* Updated this line */}
+                        <button onClick={() => handleAdd(track)}>
                             <div className="loader">
                                 <div className="song">
                                     <p className="name">{track.name}</p>

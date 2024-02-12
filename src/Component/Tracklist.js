@@ -7,8 +7,8 @@ export default function Tracklist({q, token, songs, add, remove}) {
     <>
       <div className="flexMe">
 
-          <Track tracks={songs} remove={remove}/>
-          <SearchResults q={q} token={token} add={add} />
+          <Track tracks={songs} remove={remove} token={token}/>
+          <SearchResults q={q} token={token} add={add} songs={songs}/>
       </div>
     </>
   );

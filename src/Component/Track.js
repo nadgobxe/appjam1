@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { Edit as EditIcon, Save as SaveIcon } from '@mui/icons-material/'
-export default function Track({ tracks, remove }) {
+import FetchPlaylists from "./SavePlaylist";
+
+
+
+export default function Track({ tracks, remove, token }) {
 
   const [title, setTitle] = useState("Default Name1");
   const [isEditing, setIsEditing] = useState(false);
@@ -60,6 +64,9 @@ export default function Track({ tracks, remove }) {
             </li>
           ))}
         </ul>
+                    <div>
+                      <FetchPlaylists token={token} />
+                    </div>
       </div>
     </>
   );

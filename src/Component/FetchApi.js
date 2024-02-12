@@ -6,7 +6,7 @@ export default function FetchApi({ handleTokenChange }) {
   const redirectUri = "http://localhost:3000/";
   const authEndPoint = "https://accounts.spotify.com/authorize";
   const responseType = "token";
-  const scope = "user-read-private user-read-email";
+  const scope = "user-read-private user-read-email playlist-read-private";
   const challengeCode = "S256";
 
   const [challenge, setChallenge] = useState('');
